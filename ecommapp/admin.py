@@ -7,7 +7,7 @@ class ProductImageAdmin(admin.TabularInline):
     
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductImageAdmin]
-    list_display = ['user','title','product_image','price','category','vendor','featured','product_status']
+    list_display = ['user','title','product_image','price','category','vendor','featured','product_status','p_id']
 admin.site.register(Product,ProductAdmin)
 
 
@@ -17,7 +17,7 @@ admin.site.register(Category,CategoryAdmin)
     
 class VendorAdmin(admin.ModelAdmin):
     list_display = ['title','vendor_image','contact','address']
-admin.site.register(vendor,VendorAdmin)
+admin.site.register(Vendor,VendorAdmin)
 
 class CartorderAdmin(admin.ModelAdmin):
     list_display = ['user','price','paid_status','order_date','product_status']

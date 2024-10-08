@@ -13,10 +13,11 @@
     <meta property="og:url" content="" />
     <meta property="og:image" content="" />
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.svg' %}" />
     <!-- Template CSS -->
     <link rel="stylesheet" href="{%static 'assets/css/plugins/animate.min.css' %}" />
     <link rel="stylesheet" href="{%static 'assets/css/main.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
@@ -183,7 +184,7 @@
             <div class="container">
                 <div class="header-wrap">
                     <div class="logo logo-width-1">
-                        <a href="index.html"><img src="{% static 'assets/imgs/theme/logo.svg' %}" alt="logo" /></a>
+                        <a href="{% url 'ecommapp:index' %}"><img src="{% static 'assets/imgs/theme/logo.svg' %}" alt="logo" /></a>
                     </div>
                     <div class="header-right">
                         <div class="search-style-2">
@@ -333,41 +334,12 @@
                             <div class="categories-dropdown-wrap categories-dropdown-active-large font-heading">
                                 <div class="d-flex categori-dropdown-inner">
                                     <ul>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-1.svg' %}" alt="" />Milks and Dairies</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-2.svg' %}" alt="" />Clothing & beauty</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-3.svg' %}" alt="" />Pet Foods & Toy</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-4.svg' %}" alt="" />Baking material</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-5.svg' %}" alt="" />Fresh Fruit</a>
-                                        </li>
-                                    </ul>
-                                    <ul class="end">
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-6.svg' %}" alt="" />Wines & Drinks</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-7.svg' %}" alt="" />Fresh Seafood</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-8.svg' %}" alt="" />Fast food</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-9.svg' %}" alt="" />Vegetables</a>
-                                        </li>
-                                        <li>
-                                            <a href="shop-grid-right.html"> <img src="{% static 'assets/imgs/theme/icons/category-10.svg' %}" alt="" />Bread and Juice</a>
-                                        </li>
+                                        {% for c in categories %}  
+                                        <li><a href="{% url 'ecommapp:category-product-list' c.c_id%}"> <img src="{{c.image.url}}" alt="" />{{c.title}}</a></li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
-                                <div class="more_slide_open" style="display: none">
+                                {% comment %} <div class="more_slide_open" style="display: none">
                                     <div class="d-flex categori-dropdown-inner">
                                         <ul>
                                             <li>
@@ -387,15 +359,15 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="more_categories"><span class="icon"></span> <span class="heading-sm-1">Show more...</span></div>
-                            </div>
+                                <div class="more_categories"><span class="icon"></span> <span class="heading-sm-1">Show more...</span></div>{% endcomment %}
+                            </div> 
                         </div>
                         <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block font-heading">
                             <nav>
                                 <ul>
                                     <li class="hot-deals"><img src="{% static 'assets/imgs/theme/icons/icon-hot.svg' %}" alt="hot deals" /><a href="shop-grid-right.html">Deals</a></li>
                                     <li>
-                                        <a class="active" href="index.html">Home <i class="fi-rs-angle-down"></i></a>
+                                        <a class="active" href="{% url 'ecommapp:index' %}">Home <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
                                             <li><a href="index.html">Home 1</a></li>
                                             <li><a href="index-2.html">Home 2</a></li>
@@ -405,9 +377,20 @@
                                             <li><a href="index-6.html">Home 6</a></li>
                                         </ul>
                                     </li>
-                                    <li>
+                                    {% comment %} <li>
                                         <a href="page-about.html">About</a>
+                                    </li> {% endcomment %}
+                                    <li>
+                                        <a href="shop-grid-right.html">Categories <i class="fi-rs-angle-down"></i></a>
+                                        <ul class="sub-menu">
+                                            {% for c in categories %}            
+                                                <li><a href="{% url 'ecommapp:category-product-list' c.c_id %}">{{c.title}}</a></li>
+                                            {% endfor %}
+                                            <hr>
+                                            <li><a href="{% url 'ecommapp:category-list' %}">All Category</a></li>
+                                        </ul>
                                     </li>
+
                                     <li>
                                         <a href="shop-grid-right.html">Shop <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
