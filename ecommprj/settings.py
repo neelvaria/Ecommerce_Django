@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     
     #Third Party
     'taggit',
+    'ckeditor',
     
     # 'django.contrib.sites',
     'ecommapp',
@@ -146,3 +147,12 @@ JAZZMIN_SETTINGS = {
 }
 
 AUTH_USER_MODEL = 'userauth.User'
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'skin': 'moono-lisa',  # Use the modern default skin
+        'codeSnippet_theme': 'monokai',
+        'toolbar': 'full',  # 'all' is not a valid option, try 'full' or customize it.
+        'extraPlugins': ','.join(['codesnippet', 'widget', 'dialog']),  # Use correct plugin names
+    }
+}

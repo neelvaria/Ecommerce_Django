@@ -3,6 +3,7 @@ from shortuuid.django_fields import ShortUUIDField
 from django.utils.safestring import mark_safe
 from userauth.models import User 
 from taggit.managers import TaggableManager
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
 STATUS_CHOICES = (
@@ -53,7 +54,9 @@ class Vendor(models.Model):
     title = models.CharField(max_length=100,default="Vendor Title")
     image = models.ImageField(upload_to=user_directory_path,default="vendor/default.png")
     cover_image = models.ImageField(upload_to=user_directory_path,default="vendor/default.png")
-    description = models.TextField(null=True,blank=True, default="Vendor Description")
+    description = RichTextUploadingField(null=True,blank=True, default="Vendor Description")
+    # description = models.TextField(null=True,blank=True, default="Vendor Description")
+    
     address = models.CharField(max_length=100,default="123 Main Street, San Francisco, CA 94111")
     contact = models.CharField(max_length=100,default="123-456-7890")
     chat_resp_time = models.CharField(max_length=100,default="24 hours")
@@ -78,11 +81,13 @@ class Product(models.Model):
     
     title = models.CharField(max_length=100, default="Product Title")
     image = models.ImageField(upload_to=user_directory_path)
-    description = models.TextField(null=True,blank=True, default="Product Description")  
+    description = RichTextUploadingField(null=True,blank=True, default="Product Description")  
     price = models.DecimalField(max_digits=9999999999, decimal_places=2, default=1.99)
     old_price = models.DecimalField(max_digits=9999999999, decimal_places=2, default=2.99)
     
-    specification = models.TextField(null=True,blank=True) 
+    # specification = models.TextField(null=True,blank=True) 
+    specification = RichTextUploadingField(null=True,blank=True) 
+
     type = models.CharField(max_length=100, default="organic",null=True,blank=True)
     stock = models.CharField(max_length=100, default="0",null=True,blank=True)
     expiry = models.CharField(max_length=100, default="10 Days",null=True,blank=True)
@@ -159,9 +164,9 @@ class CartorderItem(models.Model):
 
 class product_review(models.Model):
     user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True) 
-    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True)
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,related_name="reviews")
     review = models.TextField()
-    rating = models.IntegerField(choices=RATING, default=None)
+    rating = models.CharField(choices=RATING, default=None,max_length=10)
     date = models.DateTimeField(auto_now_add=True)
     
     class Meta:

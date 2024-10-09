@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render , get_object_or_404
+from ecommapp.forms import *
 from ecommapp.models import *
-from django.db.models import Count
-from django.shortcuts import get_object_or_404 
+from django.db.models import Count,Avg
 from taggit.models import Tag
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -64,11 +65,23 @@ def product_details_view(request,p_id):
     
     p_images = products.p_image.all()
     
+    #getting all reviews
+    reviews = product_review.objects.filter(product=products).order_by("-id")
+    
+    #getting average reviews
+    avg_rating = product_review.objects.filter(product=products).order_by("-id").aggregate(Avg("rating"))
+
+    #Product review form
+    review_form = productreviewform()
+    
     context = {
         "products":products,
         "p":p_images,
         "pro":product,
-        "related_products": related_products
+        "related_products": related_products,
+        "reviews":reviews,
+        "avg_rating":avg_rating,
+        "review_form":review_form
 
     }
     return render(request,'product_details.html',context)
@@ -89,3 +102,30 @@ def tags_list(request,tag_slug=None):
         "tag":tag
     }
     return render(request,'tag_list.html',context)
+
+def ajax_add_review(request,p_id):
+    product = Product.objects.get(pk=p_id)
+    user = request.user
+    
+    review = product_review.objects.create(
+        user = user,
+        product = product,
+        review = request.POST.get("review"),
+        rating = request.POST.get("rating")
+    )
+    
+    context = {
+        'user' : user.username,
+        'review' : request.POST['review'],
+        'rating' : request.POST['rating'],
+    }
+    
+    average_reviews = product_review.objects.filter(product=product).aggregate(Avg("rating"))
+    return JsonResponse(
+        {
+            'bool':True,
+            'context':context,
+            'avg_reviews':average_reviews
+        }
+    )
+    

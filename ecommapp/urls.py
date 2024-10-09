@@ -19,5 +19,8 @@ urlpatterns = [
     
     #Tags
     path('products/tag/<slug:tag_slug>/',views.tags_list,name="tags"),
+    
+    #reviews
+    path('ajax_add_review/<int:p_id>/',views.ajax_add_review,name="ajax_add_review"),
 
 ]
