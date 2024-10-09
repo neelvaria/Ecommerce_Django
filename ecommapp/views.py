@@ -2,6 +2,7 @@ from django.shortcuts import render
 from ecommapp.models import *
 from django.db.models import Count
 from django.shortcuts import get_object_or_404 
+from taggit.models import Tag
 
 # Create your views here.
 
@@ -57,13 +58,34 @@ def vendor_details_view(request,v_id):
 
 def product_details_view(request,p_id):
     products = Product.objects.get(p_id=p_id)
-    
+    product = Product.objects.filter(category=products.category).exclude(p_id=p_id)
+    related_products = Product.objects.filter(category=products.category).exclude(p_id=p_id)[:4]
     # products = get_object_or_404(Product,p_id=p_id)
     
     p_images = products.p_image.all()
     
     context = {
         "products":products,
-        "p":p_images
+        "p":p_images,
+        "pro":product,
+        "related_products": related_products
+
     }
     return render(request,'product_details.html',context)
+
+def tags_list(request,tag_slug=None):
+    products = Product.objects.filter(product_status="published").order_by("-id")
+    
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag,slug=tag_slug)
+        products = products.filter(tags__in=[tag])
+        
+        # print(products)
+        # print(tag)
+    
+    context = {
+        "products":products,
+        "tag":tag
+    }
+    return render(request,'tag_list.html',context)

@@ -16,5 +16,8 @@ urlpatterns = [
     #Product
     path('products-list',views.product_list,name="products-list"),
     path('products-list/<p_id>/',views.product_details_view,name="product-details-list"),   
+    
+    #Tags
+    path('products/tag/<slug:tag_slug>/',views.tags_list,name="tags"),
 
 ]

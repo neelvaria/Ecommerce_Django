@@ -2,6 +2,7 @@ from django.db import models
 from shortuuid.django_fields import ShortUUIDField
 from django.utils.safestring import mark_safe
 from userauth.models import User 
+from taggit.managers import TaggableManager
 
 # Create your models here.
 STATUS_CHOICES = (
@@ -88,7 +89,7 @@ class Product(models.Model):
     mfg = models.DateTimeField(auto_now_add=False,blank=True,null=True)
 
     
-    # tags = models.ForeignKey(tags,on_delete=models.SET_NULL,null=True)
+    tags = TaggableManager(blank=True)
     product_status = models.CharField(choices=STATUS, max_length=100, default="in_review")
     
     status = models.BooleanField(default=True)
