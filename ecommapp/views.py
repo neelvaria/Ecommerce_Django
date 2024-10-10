@@ -4,6 +4,8 @@ from ecommapp.models import *
 from django.db.models import Count,Avg
 from taggit.models import Tag
 from django.http import JsonResponse
+from django.utils import timezone
+
 
 # Create your views here.
 
@@ -73,6 +75,13 @@ def product_details_view(request,p_id):
 
     #Product review form
     review_form = productreviewform()
+    make_review = True
+    if request.user.is_authenticated:
+        user_review_count = product_review.objects.filter(user=request.user, product=products).count()
+        if user_review_count > 0:
+            make_review = False
+    else:
+        make_review = True
     
     context = {
         "products":products,
@@ -81,7 +90,8 @@ def product_details_view(request,p_id):
         "related_products": related_products,
         "reviews":reviews,
         "avg_rating":avg_rating,
-        "review_form":review_form
+        "review_form":review_form,
+        "make_review":make_review
 
     }
     return render(request,'product_details.html',context)
@@ -129,3 +139,12 @@ def ajax_add_review(request,p_id):
         }
     )
     
+def search_view(request):
+    query = request.GET.get('q')
+    
+    products = Product.objects.filter(title__icontains=query).order_by("-date")
+    context = {
+        "products":products,
+        "query":query
+    }
+    return render(request,'search.html',context)

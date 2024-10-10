@@ -22,5 +22,7 @@ urlpatterns = [
     
     #reviews
     path('ajax_add_review/<int:p_id>/',views.ajax_add_review,name="ajax_add_review"),
-
+    
+    #Search
+    path('search/',views.search_view,name="search"),
 ]
