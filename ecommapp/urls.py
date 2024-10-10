@@ -25,4 +25,7 @@ urlpatterns = [
     
     #Search
     path('search/',views.search_view,name="search"),
+    
+    #filter
+    path('filter-product/',views.filter_product,name="filter-product"),
 ]

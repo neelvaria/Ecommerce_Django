@@ -4,7 +4,7 @@ from ecommapp.models import *
 from django.db.models import Count,Avg
 from taggit.models import Tag
 from django.http import JsonResponse
-from django.utils import timezone
+from django.template.loader import render_to_string
 
 
 # Create your views here.
@@ -148,3 +148,17 @@ def search_view(request):
         "query":query
     }
     return render(request,'search.html',context)
+
+def filter_product(request):
+    categories = request.GET.getlist("category[]")
+    vendors = request.GET.getlist("vendor[]")
+    
+    products = Product.objects.filter(product_status="published").order_by("-id").distinct()
+    if len(categories) > 0:
+        products = products.filter(category__id__in=categories).distinct()
+        
+    if len(vendors) > 0:
+        products = products.filter(vendor__id__in=vendors)
+        
+    context = render_to_string("async/product_list.html",{"products":products})
+    return JsonResponse({"context":context})
