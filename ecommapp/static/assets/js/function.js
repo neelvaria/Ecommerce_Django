@@ -53,10 +53,15 @@ $("#commentForm").submit(function (event) {
 })
 
 $(document).ready(function () {
-    $(".filter-checkbox").on("click", function () {
+    $(".filter-checkbox, #price_filter-btn").on("click", function () {
         console.log("clicked")
         
         let filter_object = {}
+        let min_price = $("#min_price").attr("min")
+        let max_price = $("#max_price").val()
+
+        filter_object.min_price = min_price
+        filter_object.max_price = max_price
 
         $(".filter-checkbox").each(function () { 
             let filter_value = $(this).val() 
@@ -84,4 +89,49 @@ $(document).ready(function () {
             }
         })
     })
+    $("#range").on("input", function() {
+        let current_value = $(this).val();
+        $("#max_price").val(current_value);  // Sync number input
+    });
+
+    // Sync number input with range input
+    $("#max_price").on("keyup", function() {
+        let current_value = $(this).val();
+        $("#range").val(current_value);  // Sync range input
+    });
+
+     // Handle when number input loses focus (blur event)
+    $("#max_price").on("blur", function() {
+        let min_price = $(this).attr("min");
+        let max_price = $(this).attr("max");
+        let current_price = $(this).val();
+
+        // console.log("Current Value:", current_price);
+        // console.log("Min value:", min_price);
+        // console.log("Max value:", max_price);
+
+        if (current_price < parseInt(min_price) || current_price > parseInt(max_price)) {
+            console.log("Value is out of range");
+
+            min_price = Math.round(min_price * 100)/100
+            max_price = Math.round(max_price * 100)/100
+
+            // console.log("##################################")
+            // console.log("##################################")
+            // console.log("Min value:", min_price);
+            // console.log("Max value:", max_price);
+            // console.log("##################################")
+            // console.log("##################################")
+
+            alert("Price must be between: ₹"+min_price+" and ₹"+max_price);
+            $(this).val(min_price);
+            $('#range').val(min_price);
+
+            $(this).focus();
+            return false
+
+        }
+    });
 })
+
+//
