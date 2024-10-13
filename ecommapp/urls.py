@@ -28,4 +28,7 @@ urlpatterns = [
     
     #filter
     path('filter-product/',views.filter_product,name="filter-product"),
+    
+    #add to cart
+    path('add-to-cart/',views.add_to_cart,name="add_to_cart"),
 ]
