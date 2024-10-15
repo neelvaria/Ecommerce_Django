@@ -44,7 +44,7 @@ def login_view(request):
             if users is not None:
                 login(request, users)
                 messages.success(request,f"Logged in successfully!!")
-                return redirect('ecommapp:index')
+                return render('ecommapp:index.html')
         
             # else:
             #     messages.warning(request,f"User with {email} does not exist!! Create an Account")

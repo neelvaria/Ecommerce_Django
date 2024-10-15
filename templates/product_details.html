@@ -59,7 +59,7 @@
                                             </div>
                                             <div class="clearfix product-price-cover">
                                                 <div class="product-price primary-color float-left">
-                                                    <span class="current-price text-brand">₹ </span> <span class="current-price text-brand" id="current-product-price"> {{products.price}}</span>
+                                                    <span class="current-price text-brand">₹ </span> <span class="current-price text-brand current-product-price-{{ products.id }}" id="current-product-price" > {{products.price}}</span>
                                                     <span>
                                                         <span class="save-price font-md color3 ml-15">-{{products.get_percentage|floatformat:0}}%</span>
                                                         <span class="old-price font-md ml-15">₹ {{products.old_price}}</span>
@@ -85,12 +85,12 @@
                                                     <span class="qty-val">1</span>
                                                     <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                                 </div> {% endcomment %}
-                                                <input type="number" value="1" class="w-25 mb-10" name="" id="product-quantity"><br>
+                                                <input type="number" value="1" class="w-25 mb-10 product-quantity-{{products.id}}" name="" id="product-quantity"><br>
                                                 <div class="product-extra-link2">
                                                     {% comment %} <input type="hidden" value="{{ products.p_id }}" class="product-id" name="" id="">
                                                     <input type="hidden" value="{{ products.title }}" name="" class="product-title" id=""> {% endcomment %}
 
-                                                    <input type="hidden" name="" value="1" id="product-quantity" class="product-quantity-{{products.id}}">
+                                                    {% comment %} <input type="hidden" name="" value="1" id="product-quantity" class="product-quantity-{{products.id}}"> {% endcomment %}
                                                     <input type="hidden" name="" id="" class="product-pid-{{products.id}}" value="{{products.p_id}}">
                                                     <input type="hidden" class="product-image-{{ products.id }}" value="{{products.image.url}}">
                                                     <input type="hidden" class="product-id-{{ products.id }}" value="{{ products.id }}" >
@@ -407,7 +407,7 @@
                                                             <span> </span>
                                                         </div>
                                                         <div class="product-price">
-                                                            <span>₹</span><span class="current-price current-product-price-{{ p.id }}"> {{p.price}}</span>
+                                                            <span>₹</span><span class="current-price current-product-price-{{ pr.id }}"> {{pr.price}}</span>
                                                             <span class="old-price">₹ {{pr.old_price}}</span>
                                                         </div>
                                                     </div>

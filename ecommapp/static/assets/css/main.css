@@ -5561,6 +5561,16 @@ h6.post-title {
   width: 30px;
 }
 
+
+.product-name {
+  display: block;           /* Ensures it behaves like a block element */
+  max-width: 250px;          /* Adjust the width as needed */
+  word-wrap: break-word;     /* Break long words to avoid overflow */
+  word-break: break-word;    /* Ensure breaking works on all browsers */
+  white-space: normal;       /* Allow normal text wrapping */
+  line-height: 1.4;          /* Adjust line spacing for better readability */
+}
+
 /*Responsive*/
 @media only screen and (max-width: 992px) {
   .invoice .invoice-header {
