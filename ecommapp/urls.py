@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path , include
 from . import views
 
 app_name = 'ecommapp'
@@ -37,4 +37,13 @@ urlpatterns = [
     
     #checkout
     path('checkout/',views.checkout_view,name="checkout"),
+    
+    #paypal 
+    path('paypal/',include('paypal.standard.ipn.urls')),
+    
+    #payment success
+    path('payment-success/',views.payment_completed_view,name="payment-success"),
+    
+    #payment failed
+    path('payment-failed/',views.payment_failed_view,name="payment-failed"),
 ]

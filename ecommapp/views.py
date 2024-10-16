@@ -6,6 +6,10 @@ from taggit.models import Tag
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib import messages
+from django.conf import settings
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from paypal.standard.forms import PayPalPaymentsForm
 
 
 # Create your views here.
@@ -240,8 +244,31 @@ def update_cart(request):
     return JsonResponse({"data":context, 'totalcartitems':len(request.session['cart_data_obj'])})
 
 def checkout_view(request):
+    host = request.get_host()
+    paypal_dict = {
+        'business':settings.PAYPAL_RECEIVER_EMAIL,
+        'amount':'200',
+        'item_name':"Order-Item-No-3",
+        'invoice':'INVOICE-0001',
+        'currency_code':'INR',
+        'notify_url':"http://{}{}".format(host,reverse('ecommapp:paypal-ipn')),
+        'return_url':"http://{}{}".format(host,reverse('ecommapp:payment-success')),
+        'cancel_url':"http://{}{}".format(host,reverse('ecommapp:payment-failed')),
+    }
+    
+    paypal_payment_btn = PayPalPaymentsForm(initial=paypal_dict)
+    
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, p_data in request.session['cart_data_obj'].items():
             cart_total_amount += float(p_data['price']) * int(p_data['qty'])
-        return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 'totalcartitems':len(request.session['cart_data_obj']),'cart_total_amount':cart_total_amount})
+        return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 'totalcartitems':len(request.session['cart_data_obj']),'cart_total_amount':cart_total_amount , 'paypal_payment_btn':paypal_payment_btn})
+
+
+def payment_completed_view(request):
+    
+    return render(request,'payment-completed.html')
+
+def payment_failed_view(request):
+    
+    return render(request,'payment-failed.html')

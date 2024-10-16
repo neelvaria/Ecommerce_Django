@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     # 'django.contrib.sites',
     'ecommapp',
     'userauth',
+    
+    #paypal
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -156,3 +159,6 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join(['codesnippet', 'widget', 'dialog']),  # Use correct plugin names
     }
 }
+
+PAYPAL_RECEIVER_EMAIL = 'sb-02txn33242085@business.example.com'
+PAYPAL_TEST = True
