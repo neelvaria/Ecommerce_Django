@@ -193,6 +193,7 @@ class Address(models.Model):
     user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
     address = models.CharField(max_length=200, null=True)
     status = models.BooleanField(default=False)
+    contact = models.CharField(max_length=200, null=True)
     
     class Meta:
         verbose_name_plural = "Address"

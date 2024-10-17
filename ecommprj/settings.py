@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     #Third Party
     'taggit',
     'ckeditor',
+    'corsheaders',
     
     # 'django.contrib.sites',
     'ecommapp',
@@ -58,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add this
+
 ]
 
 ROOT_URLCONF = 'ecommprj.urls'
@@ -80,6 +83,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ecommprj.wsgi.application'
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins (for testing)
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Database
@@ -161,5 +170,5 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-PAYPAL_RECEIVER_EMAIL = 'businesshack@gmail.com'
+PAYPAL_RECEIVER_EMAIL = 'businessneel@gmail.com'
 PAYPAL_TEST = True

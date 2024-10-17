@@ -46,4 +46,8 @@ urlpatterns = [
     
     #payment failed
     path('payment-failed/',views.payment_failed_view,name="payment-failed"),
+    
+    #customer dashboard
+    path('customer-dashboard/',views.customer_dashboard,name="customer-dashboard"),
+    path('customer-orders/<int:id>/',views.order_details,name="customer-orders"),
 ]

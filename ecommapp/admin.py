@@ -38,7 +38,7 @@ class whislistAdmin(admin.ModelAdmin):
 admin.site.register(whislist,whislistAdmin)
 
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ['user','address','status']
+    list_display = ['user','address','status','contact']
 admin.site.register(Address,AddressAdmin)
 
 class Product_imageAdmin(admin.ModelAdmin):

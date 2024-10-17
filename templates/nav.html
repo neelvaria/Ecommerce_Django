@@ -125,7 +125,7 @@
                         <div class="header-info">
                             <ul>
                                 <li><a href="page-about.htlm">About Us</a></li>
-                                <li><a href="page-account.html">My Account</a></li>
+                                <li><a href="{% url 'ecommapp:customer-dashboard' %}">My Account</a></li>
                                 <li><a href="shop-wishlist.html">Wishlist</a></li>
                                 <li><a href="shop-order.html">Order Tracking</a></li>
                             </ul>
@@ -265,7 +265,7 @@
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                                         <ul>
                                             <li>
-                                                <a href="page-account.html"><i class="fi fi-rs-user mr-10"></i>My Account</a>
+                                                <a href="{% url 'ecommapp:customer-dashboard' %}"><i class="fi fi-rs-user mr-10"></i>My Account</a>
                                             </li>
                                             <li>
                                                 <a href="page-account.html"><i class="fi fi-rs-location-alt mr-10"></i>Order Tracking</a>

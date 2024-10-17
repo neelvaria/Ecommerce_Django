@@ -282,28 +282,61 @@ def checkout_view(request):
         'amount':cart_total_amount,
         'item_name':"Order-Item-No-"+ str(order.id),
         'invoice':'INVOICE-' + str(order.id),
-        'currency_code':'INR',
-        'notify_url': f"http://{host}{reverse('ecommapp:paypal-ipn')}",
-        'return_url': f"http://{host}{reverse('ecommapp:payment-success')}",
-        'cancel_url': f"http://{host}{reverse('ecommapp:payment-failed')}",
+        'currency_code':'USD',
+        'notify_url': f"http://127.0.0.1:8000{reverse('ecommapp:paypal-ipn')}",
+        'return_url': f"http://127.0.0.1:8000{reverse('ecommapp:payment-success')}",
+        'cancel_url': f"http://127.0.0.1:8000{reverse('ecommapp:payment-failed')}",
     }
     
     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
     print(paypal_form)
     
+    # cart_total_amount = 0
+    # if 'cart_data_obj' in request.session:
+    #     for p_id, p_data in request.session['cart_data_obj'].items():
+    #         cart_total_amount += float(p_data['price']) * int(p_data['qty'])
+    return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 
+                    'totalcartitems':len(request.session['cart_data_obj']),
+                    'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form})
+
+@login_required
+def payment_completed_view(request):
+    address = Address.objects.get(user=request.user)
+    
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, p_data in request.session['cart_data_obj'].items():
             cart_total_amount += float(p_data['price']) * int(p_data['qty'])
-        return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 
+        
+    return render(request,'payment-completed.html',{"cart_data":request.session['cart_data_obj'], 
                     'totalcartitems':len(request.session['cart_data_obj']),
-                    'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form})
-
-
-def payment_completed_view(request):
-    
-    return render(request,'payment-completed.html')
+                    'cart_total_amount':cart_total_amount,'address':address})
 
 def payment_failed_view(request):
-    
     return render(request,'payment-failed.html')
+
+@login_required
+def customer_dashboard(request):
+    
+    orders = Cartorder.objects.filter(user = request.user).order_by("-id")
+    address = Address.objects.filter(user = request.user)
+    
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        
+        new_address = Address.objects.create(user = request.user, address = address, contact = phone)
+        messages.success(request,'New address added successfully')
+        # new_address.save()
+        return redirect('ecommapp:customer-dashboard')
+        
+    context = {'orders':orders, 'address':address}
+    
+    return render(request,'customer-dashboard.html',context)
+
+def order_details(request, id):
+    order = Cartorder.objects.get(user = request.user, id = id)
+    products = CartorderItem.objects.filter(order = order)
+    context = {'products':products}
+    
+    return render(request,'order-details.html',context)
