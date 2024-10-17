@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -149,6 +148,8 @@ JAZZMIN_SETTINGS = {
     "copyright": "E-Commerce",
 }
 
+LOGIN_URL = "userauth:login"
+
 AUTH_USER_MODEL = 'userauth.User'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_CONFIGS = {
@@ -160,5 +161,5 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-PAYPAL_RECEIVER_EMAIL = 'sb-02txn33242085@business.example.com'
+PAYPAL_RECEIVER_EMAIL = 'businesshack@gmail.com'
 PAYPAL_TEST = True

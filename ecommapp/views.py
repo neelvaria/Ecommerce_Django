@@ -7,9 +7,13 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.conf import settings
+
+#paypal stuff
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from paypal.standard.forms import PayPalPaymentsForm
+from django.contrib.auth.decorators import login_required
+import secrets
 
 
 # Create your views here.
@@ -172,7 +176,7 @@ def filter_product(request):
         
     context = render_to_string("async/product_list.html",{"products":products})
     return JsonResponse({"context":context})
-
+@login_required
 def add_to_cart(request):
     cart_product = {}
     
@@ -243,26 +247,57 @@ def update_cart(request):
     context = render_to_string("async/cart-list.html",{"cart_data":request.session['cart_data_obj'], 'totalcartitems':len(request.session['cart_data_obj']),'cart_total_amount':cart_total_amount})
     return JsonResponse({"data":context, 'totalcartitems':len(request.session['cart_data_obj'])})
 
+@login_required
 def checkout_view(request):
+    
+    cart_total_amount = 0
+    total_amount = 0
+    if 'cart_data_obj' in request.session:
+        for p_id, p_data in request.session['cart_data_obj'].items():
+            total_amount += float(p_data['price']) * int(p_data['qty'])
+    
+    order = Cartorder.objects.create(
+        user = request.user,
+        price = total_amount,
+    )
+    
+    for p_id, p_data in request.session['cart_data_obj'].items():
+        cart_total_amount += float(p_data['price']) * int(p_data['qty'])
+
+        cart_order_product = CartorderItem.objects.create(
+            order = order,
+            invoice_no = 'INV-'+str(order.id),
+            item = p_data['title'],
+            image = p_data['image'],
+            qty = p_data['qty'],
+            price = p_data['price'],
+            total = float(p_data['price']) * int(p_data['qty']),
+            
+        )
+
     host = request.get_host()
+
     paypal_dict = {
         'business':settings.PAYPAL_RECEIVER_EMAIL,
-        'amount':'200',
-        'item_name':"Order-Item-No-3",
-        'invoice':'INVOICE-0001',
+        'amount':cart_total_amount,
+        'item_name':"Order-Item-No-"+ str(order.id),
+        'invoice':'INVOICE-' + str(order.id),
         'currency_code':'INR',
-        'notify_url':"http://{}{}".format(host,reverse('ecommapp:paypal-ipn')),
-        'return_url':"http://{}{}".format(host,reverse('ecommapp:payment-success')),
-        'cancel_url':"http://{}{}".format(host,reverse('ecommapp:payment-failed')),
+        'notify_url': f"http://{host}{reverse('ecommapp:paypal-ipn')}",
+        'return_url': f"http://{host}{reverse('ecommapp:payment-success')}",
+        'cancel_url': f"http://{host}{reverse('ecommapp:payment-failed')}",
     }
     
-    paypal_payment_btn = PayPalPaymentsForm(initial=paypal_dict)
+    paypal_form = PayPalPaymentsForm(initial=paypal_dict)
+    print(paypal_form)
     
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, p_data in request.session['cart_data_obj'].items():
             cart_total_amount += float(p_data['price']) * int(p_data['qty'])
-        return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 'totalcartitems':len(request.session['cart_data_obj']),'cart_total_amount':cart_total_amount , 'paypal_payment_btn':paypal_payment_btn})
+        return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 
+                    'totalcartitems':len(request.session['cart_data_obj']),
+                    'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form})
 
 
 def payment_completed_view(request):
