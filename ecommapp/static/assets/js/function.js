@@ -258,6 +258,33 @@ $(document).ready(function () {
         })
         
     })
+
+
+    //adding to wishlist
+    $(document).on("click", ".add-to-wishlist", function () {
+        let id = $(this).attr("data-product-item")
+        let this_val = $(this)
+
+        console.log("Product ID: ",id);
+        console.log("This: ",this_val);
+
+        $.ajax({
+            url:'/add-to-wishlist',
+            data:{
+                "id":id,
+            },
+            dataType:"json",
+            beforeSend: function () {
+                this_val.html("✔")
+            },
+
+            success:function(response){
+                if (response.bool == true) {
+                    console.log("Product added to wishlist!!!");
+                }
+            }
+        })
+    })
     
 })
 

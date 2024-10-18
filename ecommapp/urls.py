@@ -51,4 +51,9 @@ urlpatterns = [
     path('customer-dashboard/',views.customer_dashboard,name="customer-dashboard"),
     path('customer-orders/<int:id>/',views.order_details,name="customer-orders"),
     path('make-default-address/',views.make_address_default,name="make-default-address"),
+    
+    #wishlist
+    path('wishlist/',views.wishlist_view,name="wishlist"),
+    path('add-to-wishlist/',views.add_to_wishlist,name="add-to-wishlist"),
+    path('remove_whislist/',views.remove_wishlist,name="remove_whislist"),
 ]

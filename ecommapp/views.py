@@ -356,3 +356,44 @@ def make_address_default(request):
     Address.objects.update(status = False)
     Address.objects.filter(id = id).update(status = True)
     return JsonResponse({'bool':True})
+
+def wishlist_view(request):
+    try:
+        Wishlist = whislist.objects.all()
+    except:
+        Wishlist = None
+    return render(request,'wishlist.html',{'Wishlist':Wishlist})
+
+def add_to_wishlist(request):
+    id = request.GET.get('id')
+    product = Product.objects.get(id = id)
+    
+    context = {}
+    
+    wishlist_count = whislist.objects.filter(user = request.user, product = product).count()
+    if wishlist_count > 0:
+        # whislist.objects.filter(user = request.user, product = product).delete()
+        context = {
+            "bool":True
+        }
+        
+    else:
+        new_wishlist = whislist.objects.create(user = request.user, product = product)
+        context = {
+            "bool":True        
+        }
+            
+    return JsonResponse({'bool':True})
+
+def remove_wishlist(request):
+    id = request.GET.get('id')
+    delete_wishlist = whislist.objects.filter(user = request.user).count()
+    wishlist_d = whislist.objects.filter(id = id).delete()
+    delete_product = wishlist_d.delete()
+    
+    context = {
+        "bool":True,
+        "delete_whishlist":delete_wishlist
+    }
+    t = render_to_string('async/wishlist.html',context)
+    return JsonResponse({'bool':True,'data':t})

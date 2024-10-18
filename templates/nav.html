@@ -236,11 +236,11 @@
                                     <a href="shop-compare.html"><span class="lable ml-0">Compare</span></a>
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="{% url 'ecommapp:wishlist' %}">
                                         <img class="svgInject" alt="Nest" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}" />
-                                        <span class="pro-count blue">6</span>
+                                        <span class="pro-count blue">{{ whislist_count.count }}</span>
                                     </a>
-                                    <a href="shop-wishlist.html"><span class="lable">Wishlist</span></a>
+                                    <a href="{% url 'ecommapp:wishlist' %}"><span class="lable">Wishlist</span></a>
                                 </div>
                                 <div class="header-action-icon-2">
                                     <a class="mini-cart-icon" href="{% url 'ecommapp:cart' %}">
@@ -274,7 +274,7 @@
                                                 <a href="page-account.html"><i class="fi fi-rs-label mr-10"></i>My Voucher</a>
                                             </li>
                                             <li>
-                                                <a href="shop-wishlist.html"><i class="fi fi-rs-heart mr-10"></i>My Wishlist</a>
+                                                <a href="{% url 'ecommapp:wishlist' %}"><i class="fi fi-rs-heart mr-10"></i>My Wishlist</a>
                                             </li>
                                             <li><a href="page-account.html"><i class="fi fi-rs-settings-sliders mr-10"></i>Setting</a></li>
                                             {% if request.user.is_authenticated %}
@@ -462,9 +462,14 @@
                                         <ul class="sub-menu">
                                             <li><a href="page-about.html">About Us</a></li>
                                             <li><a href="page-contact.html">Contact</a></li>
-                                            <li><a href="page-account.html">My Account</a></li>
-                                            <li><a href="page-login.html">Login</a></li>
-                                            <li><a href="page-register.html">Register</a></li>
+                                            <li><a href="{% url 'ecommapp:customer-dashboard' %}">My Account</a></li>
+
+                                            {% if request.user.is_authenticated %}
+                                            <li><a href="{%url 'userauth:logout' %}">Sign out</a></li>
+                                            {% else %}
+                                            <li><a href="{% url 'userauth:register' %}">Register<</a></li>
+                                            <li><a href="{%url 'userauth:login' %}">Login</a></li>
+                                            {% endif %}
                                             <li><a href="page-forgot-password.html">Forgot password</a></li>
                                             <li><a href="page-reset-password.html">Reset password</a></li>
                                             <li><a href="page-purchase-guide.html">Purchase Guide</a></li>
