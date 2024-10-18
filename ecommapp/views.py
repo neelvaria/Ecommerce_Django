@@ -291,17 +291,27 @@ def checkout_view(request):
     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
     print(paypal_form)
     
+    
+    
     # cart_total_amount = 0
     # if 'cart_data_obj' in request.session:
     #     for p_id, p_data in request.session['cart_data_obj'].items():
     #         cart_total_amount += float(p_data['price']) * int(p_data['qty'])
+    
+    try:
+        active_address = Address.objects.get(user = request.user, status = True)
+    except:
+        messages.warning(request,"There are mutiple addresses. Please add a one address as default")
+        active_address = None
+    
     return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 
                     'totalcartitems':len(request.session['cart_data_obj']),
-                    'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form})
+                    'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form,
+                    'active_address':active_address})
 
 @login_required
 def payment_completed_view(request):
-    address = Address.objects.get(user=request.user)
+    address = Address.objects.filter(user=request.user, status = True).first()
     
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
@@ -340,3 +350,9 @@ def order_details(request, id):
     context = {'products':products}
     
     return render(request,'order-details.html',context)
+
+def make_address_default(request):
+    id = request.GET.get('id')
+    Address.objects.update(status = False)
+    Address.objects.filter(id = id).update(status = True)
+    return JsonResponse({'bool':True})

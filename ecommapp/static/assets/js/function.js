@@ -230,6 +230,34 @@ $(document).ready(function () {
             }
         })
     })
+
+    //Make default address
+    $(document).on("click", ".make-default-address", function () {
+        let id = $(this).attr("data-address-id")
+        let this_val = $(this)
+
+        console.log("Address ID: ",id);
+        console.log("This: ",this_val)
+
+        $.ajax({
+            url:'/make-default-address',
+            data:{
+                "id":id
+            },
+            dataType:"json",
+            success:function(response){
+                console.log("Address made Default!!!");
+                if (response.bool == true) {
+                    $(".check").hide()
+                    $(".action-btn").show()
+
+                    $(".check"+id).show()
+                    $(".button"+id).hide()
+                }
+            }
+        })
+        
+    })
     
 })
 

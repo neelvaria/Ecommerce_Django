@@ -65,21 +65,19 @@
                         <form method="post">
                             <div class="row">
                                 <div class="form-group col-lg-6">
-                                    <input type="text" required="" name="fname" placeholder="First name *">
+                                    <input type="text" required=""  value="{{ request.user.username|title}}" name="fname" placeholder="First name *">
                                 </div>
                                 <div class="form-group col-lg-6">
-                                    <input type="text" required="" name="lname" placeholder="Last name *">
+                                    <input type="text" required="" name="lname" placeholder="Contact *" value="{{active_address.contact}}">
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="form-group col-lg-6">
-                                    <input type="text" name="billing_address" required="" placeholder="Address *">
-                                </div>
-                                <div class="form-group col-lg-6">
-                                    <input type="text" name="billing_address2" required="" placeholder="Address line2">
+                                <div class="form-group col-lg-12">
+                                    <input type="text" name="billing_address" value="{{ active_address }}" required="" placeholder="Address *">
                                 </div>
                             </div>
-                            <div class="row shipping_calculator">
+
+                            {% comment %} <div class="row shipping_calculator">
                                 <div class="form-group col-lg-6">
                                     <div class="custom_select">
                                         <select class="form-control select-active">
@@ -353,8 +351,8 @@
                             </div>
                             <div class="form-group mb-30">
                                 <textarea rows="5" placeholder="Additional information"></textarea>
-                            </div>
-                            <div class="form-group">
+                            </div> {% endcomment %}
+                            {% comment %} <div class="form-group">
                                 <div class="checkbox">
                                     <div class="custome-checkbox">
                                         <input class="form-check-input" type="checkbox" name="checkbox" id="createaccount">
@@ -368,8 +366,8 @@
                                         <input required="" type="password" placeholder="Password" name="password">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="ship_detail">
+                            </div> {% endcomment %}
+                            {% comment %} <div class="ship_detail">
                                 <div class="form-group">
                                     <div class="chek-form">
                                         <div class="custome-checkbox">
@@ -665,7 +663,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
+
                         </form>
                     </div>
                 </div>

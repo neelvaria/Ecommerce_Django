@@ -191,7 +191,7 @@ class whislist(models.Model):
 
 class Address(models.Model):
     user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
-    address = models.CharField(max_length=200, null=True)
+    address = models.CharField(max_length=1000, null=True)
     status = models.BooleanField(default=False)
     contact = models.CharField(max_length=200, null=True)
     
