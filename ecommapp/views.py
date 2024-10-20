@@ -14,6 +14,9 @@ from django.views.decorators.csrf import csrf_exempt
 from paypal.standard.forms import PayPalPaymentsForm
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
+import calendar
+from datetime import datetime
+from django.db.models.functions import *
 
 # Create your views here.
 
@@ -327,8 +330,21 @@ def payment_failed_view(request):
 @login_required
 def customer_dashboard(request):
     
-    orders = Cartorder.objects.filter(user = request.user).order_by("-id")
+    orders_list = Cartorder.objects.filter(user = request.user).order_by("-id")
     address = Address.objects.filter(user = request.user)
+    
+    orders = Cartorder.objects.annotate(month = ExtractMonth("order_date")).values("month").annotate(count = Count("id")).values('month', 'count')
+    month = []
+    total_orders = []
+    
+    for o in orders:
+        month.append(calendar.month_name[o['month']])
+        total_orders.append(o['count'])
+    
+    print(orders)
+    print(month)
+    print(total_orders)
+    
     
     if request.method == 'POST':
         address = request.POST.get('address')
@@ -339,7 +355,8 @@ def customer_dashboard(request):
         # new_address.save()
         return redirect('ecommapp:customer-dashboard')
         
-    context = {'orders':orders, 'address':address}
+    context = {'orders_list':orders_list, 'address':address , 'orders':orders
+               , 'month':month, 'total_orders':total_orders}
     
     return render(request,'customer-dashboard.html',context)
 
