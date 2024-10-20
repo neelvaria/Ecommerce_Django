@@ -285,6 +285,32 @@ $(document).ready(function () {
             }
         })
     })
+
+    //Remove from wishlist
+    $(document).on("click", ".delete-wishlist-product", function () { 
+        let w_list = $(this).attr("data-whislist-product")
+        let this_val = $(this)
+
+        console.log("Wishlist ID: ",w_list);
+        console.log("This: ",this_val);
+
+        $.ajax({
+            url:'/remove_whislist',
+            data:{
+                "id":w_list
+            },
+            dataType:"json",
+            beforeSend: function () {
+                console.log("Product removing from wishlist....");
+            },
+            success:function(response){
+                console.log("Updated HTML:", response.data);
+                console.log("Wishlist JSON:", response.w);
+                $("#wishlist-list").html(response.data)
+                console.log("Product removed from wishlist!!!");
+            },
+        })
+    })
     
 })
 

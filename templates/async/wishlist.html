@@ -1,7 +1,4 @@
-{% load static %}
-{% include "nav.html" %}
-    <!--End header-->
-    <main class="main" id="wishlist-list">
+    <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
@@ -33,7 +30,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {%for w in Wishlist%}
+                                {% for w in Wishlist %}
                                 <tr class="pt-30">
                                     <td class="custome-checkbox pl-30">
                                         <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="" />
@@ -81,4 +78,3 @@
             </div>
         </div>
     </main>
-{% include "footer.html" %}
