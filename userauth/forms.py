@@ -12,4 +12,14 @@ class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+        
+class updateprofileForm(forms.ModelForm):
+    full_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Full Name'}))
+    bio = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Bio'}))
+    phone = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Phone Number'}))
+    
+    
+    class Meta:
+        model = profile_details
+        fields = ['full_name','image','bio', 'phone']
     

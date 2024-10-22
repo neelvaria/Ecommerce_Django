@@ -1,5 +1,6 @@
 from django.contrib import admin
 from ecommapp.models import *
+from userauth.models import *
 # Register your models here.
 
 class ProductImageAdmin(admin.TabularInline):
@@ -46,4 +47,3 @@ class Product_imageAdmin(admin.ModelAdmin):
     
     list_display = ['product','images']
 admin.site.register(ProductImage,Product_imageAdmin)
-    

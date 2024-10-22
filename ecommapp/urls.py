@@ -56,4 +56,9 @@ urlpatterns = [
     path('wishlist/',views.wishlist_view,name="wishlist"),
     path('add-to-wishlist/',views.add_to_wishlist,name="add-to-wishlist"),
     path('remove_whislist/',views.remove_wishlist,name="remove_whislist"),
+    
+    #contact
+    path('contact/',views.contact_view,name="contact"),
+    path('contact-ajax', views.ajax_contact, name='contact-ajax'),  # Match this with the AJAX call
+
 ]

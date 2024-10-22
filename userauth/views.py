@@ -44,7 +44,7 @@ def login_view(request):
             if users is not None:
                 login(request, users)
                 messages.success(request,f"Logged in successfully!!")
-                return redirect('ecommapp:index')
+                return render(request,'index.html')
         
             # else:
             #     messages.warning(request,f"User with {email} does not exist!! Create an Account")
@@ -60,3 +60,24 @@ def logout_view(request):
     messages.warning(request,"You have been logged out!!")
 
     return redirect('userauth:login')
+
+
+def update_profile(request):
+    get_profile = profile_details.objects.get(user = request.user)
+
+    if request.method == "POST":
+        form = updateprofileForm(request.POST, request.FILES , instance=get_profile)
+        if form.is_valid():
+            profile_save = form.save(commit=False)
+            profile_save.user = request.user
+            profile_save.save()
+            messages.success(request,f"Profile updated successfully!!")
+            return redirect('ecommapp:customer-dashboard')
+    else:
+        form = updateprofileForm(instance=get_profile)
+    
+    context = {
+        'form':form,
+        'get_profile':get_profile
+    }
+    return render(request,'update_profile.html',context)

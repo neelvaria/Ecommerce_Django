@@ -17,6 +17,7 @@ from django.core import serializers
 import calendar
 from datetime import datetime
 from django.db.models.functions import *
+from userauth.models import *
 
 # Create your views here.
 
@@ -332,7 +333,7 @@ def customer_dashboard(request):
     
     orders_list = Cartorder.objects.filter(user = request.user).order_by("-id")
     address = Address.objects.filter(user = request.user)
-    
+        
     orders = Cartorder.objects.annotate(month = ExtractMonth("order_date")).values("month").annotate(count = Count("id")).values('month', 'count')
     month = []
     total_orders = []
@@ -354,9 +355,17 @@ def customer_dashboard(request):
         messages.success(request,'New address added successfully')
         # new_address.save()
         return redirect('ecommapp:customer-dashboard')
+    
+    profile = profile_details.objects.get(user = request.user)
+    print(profile)
         
-    context = {'orders_list':orders_list, 'address':address , 'orders':orders
-               , 'month':month, 'total_orders':total_orders}
+    context = {'orders_list':orders_list, 
+               'address':address , 
+               'orders':orders, 
+               'month':month, 
+               'total_orders':total_orders, 
+               'profile':profile
+    }
     
     return render(request,'customer-dashboard.html',context)
 
@@ -414,3 +423,34 @@ def remove_wishlist(request):
     whislist_json = serializers.serialize('json',Wishlist)
     data = render_to_string('async/wishlist.html',context)
     return JsonResponse({"data":data, "w":whislist_json})
+
+
+def contact_view(request):
+    return render(request,'contact.html')
+
+def ajax_contact(request):
+    print("Data Accessed!!")
+    if request.method == 'POST': 
+        print("POST request received")  # Ensure POST method is called
+       
+        full_name = request.POST.get('full_name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        subject = request.POST.get('subject')
+            
+        contact = contactus.objects.create(
+            full_name = full_name, 
+            phone = phone,
+            email = email, 
+            message = message, 
+            subject = subject
+        )
+            
+    context = {
+        "bool":True,
+        "messages":"Message sent successfully",
+        # "new_contact":new_contact
+    }
+    
+    return JsonResponse({"data":context})

@@ -312,6 +312,49 @@ $(document).ready(function () {
         })
     })
     
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    $(document).on("submit", "#contact-form-ajax", function (e) {
+        e.preventDefault()
+        console.log("Form Submitted");
+
+        let full_name = $("#full_name").val()
+        let email = $("#email").val()
+        let subject = $("#subject").val()
+        let message = $("#message").val()
+        let phone = $("#phone").val()
+
+        console.log("Full Name: ",full_name);
+        console.log("Email: ",email);
+        console.log("Subject: ",subject);
+        console.log("Message: ",message);
+        console.log("Phone: ",phone);
+
+        $.ajax({
+            url:"/contact-ajax",
+            type:"POST",
+            data:{
+                "full_name":full_name,
+                "email":email,
+                "subject":subject,
+                "message":message,
+                "phone":phone
+            },
+            headers: {
+                "X-CSRFToken": getCSRFToken(),  // Include CSRF token in the request
+            },
+            dataType:"json",
+            beforeSend: function () {
+                console.log("Sending....");
+            },
+            success: function (response) {
+                console.log("Data sent to Server Successfully!!!!!");
+                console.log("Response: ", response);
+            },
+        })
+    })
 })
 
 //Add to cart
