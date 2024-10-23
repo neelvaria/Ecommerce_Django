@@ -250,67 +250,142 @@ def update_cart(request):
     context = render_to_string("async/cart-list.html",{"cart_data":request.session['cart_data_obj'], 'totalcartitems':len(request.session['cart_data_obj']),'cart_total_amount':cart_total_amount})
     return JsonResponse({"data":context, 'totalcartitems':len(request.session['cart_data_obj'])})
 
-@login_required
-def checkout_view(request):
-    
+def save_checkout_info(request):
     cart_total_amount = 0
     total_amount = 0
-    if 'cart_data_obj' in request.session:
-        for p_id, p_data in request.session['cart_data_obj'].items():
-            total_amount += float(p_data['price']) * int(p_data['qty'])
     
-    order = Cartorder.objects.create(
-        user = request.user,
-        price = total_amount,
-    )
-    
-    for p_id, p_data in request.session['cart_data_obj'].items():
-        cart_total_amount += float(p_data['price']) * int(p_data['qty'])
+    if request.method == "POST":
+        full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        mobile = request.POST.get('mobile')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
 
-        cart_order_product = CartorderItem.objects.create(
-            order = order,
-            invoice_no = 'INV-'+str(order.id),
-            item = p_data['title'],
-            image = p_data['image'],
-            qty = p_data['qty'],
-            price = p_data['price'],
-            total = float(p_data['price']) * int(p_data['qty']),
+        request.session['full_name'] = full_name
+        request.session['email'] = email
+        request.session['mobile'] = mobile
+        request.session['address'] = address
+        request.session['city'] = city
+        request.session['state'] = state
+        request.session['country'] = country
+        
+        if 'cart_data_obj' in request.session:
+            for p_id, p_data in request.session['cart_data_obj'].items():
+                total_amount += float(p_data['price']) * int(p_data['qty'])
+    
+            order = Cartorder.objects.create(
+                user = request.user,
+                price = total_amount,
+                full_name = full_name,
+                email = email,
+                phone = mobile,
+                address = address,
+                city = city,
+                state = state,
+                country = country
+            )
             
-        )
+            del request.session['full_name']
+            del request.session['email']
+            del request.session['mobile']
+            del request.session['address']
+            del request.session['city']
+            del request.session['state']
+            del request.session['country']
+    
+            for p_id, p_data in request.session['cart_data_obj'].items():
+                cart_total_amount += float(p_data['price']) * int(p_data['qty'])
 
-    host = request.get_host()
+                cart_order_product = CartorderItem.objects.create(
+                    order = order,
+                    invoice_no = 'INV-'+str(order.id),
+                    item = p_data['title'],
+                    image = p_data['image'],
+                    qty = p_data['qty'],
+                    price = p_data['price'],
+                    total = float(p_data['price']) * int(p_data['qty']),  
+                )
+        return redirect('ecommapp:checkout', order.oid)
+    return redirect('ecommapp:checkout', order.oid)
 
-    paypal_dict = {
-        'business':settings.PAYPAL_RECEIVER_EMAIL,
-        'amount':cart_total_amount,
-        'item_name':"Order-Item-No-"+ str(order.id),
-        'invoice':'INVOICE-' + str(order.id),
-        'currency_code':'USD',
-        'notify_url': f"http://127.0.0.1:8000{reverse('ecommapp:paypal-ipn')}",
-        'return_url': f"http://127.0.0.1:8000{reverse('ecommapp:payment-success')}",
-        'cancel_url': f"http://127.0.0.1:8000{reverse('ecommapp:payment-failed')}",
+            
+@login_required
+def checkout_view(request,oid):
+    order = Cartorder.objects.get(user=request.user, oid=oid)
+    order_items = CartorderItem.objects.filter(order = order)
+    
+    if request.method == "POST":
+        code = request.POST.get('code')
+        coupon = Coupon.objects.filter(code = code,active=True).first()
+        if coupon:
+            if coupon in order.coupon.all():
+                messages.warning(request,'Coupon already activated!!')
+                return redirect('ecommapp:checkout', order.oid)
+            else:
+                messages.warning(request,'Coupon already applied!!')
+                return redirect('ecommapp:checkout', order.oid)
+        print(code)
+    
+    context = {
+        'order':order,
+        'order_items':order_items
     }
     
-    paypal_form = PayPalPaymentsForm(initial=paypal_dict)
-    print(paypal_form)
+    return render(request,'checkout.html',context)
     
-    
-    
+    #old checkout
     # cart_total_amount = 0
+    # total_amount = 0
     # if 'cart_data_obj' in request.session:
     #     for p_id, p_data in request.session['cart_data_obj'].items():
+    #         total_amount += float(p_data['price']) * int(p_data['qty'])
+    
+    #     order = Cartorder.objects.create(
+    #         user = request.user,
+    #         price = total_amount,
+    #     )
+    
+    #     for p_id, p_data in request.session['cart_data_obj'].items():
     #         cart_total_amount += float(p_data['price']) * int(p_data['qty'])
+
+    #         cart_order_product = CartorderItem.objects.create(
+    #             order = order,
+    #             invoice_no = 'INV-'+str(order.id),
+    #             item = p_data['title'],
+    #             image = p_data['image'],
+    #             qty = p_data['qty'],
+    #             price = p_data['price'],
+    #             total = float(p_data['price']) * int(p_data['qty']),  
+    #         )
+
+    #     host = request.get_host()
+
+    #     paypal_dict = {
+    #         'business':settings.PAYPAL_RECEIVER_EMAIL,
+    #         'amount':cart_total_amount,
+    #         'item_name':"Order-Item-No-"+ str(order.id),
+    #         'invoice':'INVOICE-' + str(order.id),
+    #         'currency_code':'USD',
+    #         'notify_url': f"http://127.0.0.1:8000{reverse('ecommapp:paypal-ipn')}",
+    #         'return_url': f"http://127.0.0.1:8000{reverse('ecommapp:payment-success')}",
+    #         'cancel_url': f"http://127.0.0.1:8000{reverse('ecommapp:payment-failed')}",
+    #     }
     
-    try:
-        active_address = Address.objects.get(user = request.user, status = True)
-    except:
-        messages.warning(request,"There are mutiple addresses. Please add a one address as default")
-        active_address = None
+    #     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
+    #     print(paypal_form)
     
-    return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 
-                    'totalcartitems':len(request.session['cart_data_obj']),
-                    'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form,
-                    'active_address':active_address})
+    #     try:
+    #         active_address = Address.objects.get(user = request.user, status = True)
+    #     except:
+    #         messages.warning(request,"There are mutiple addresses. Please add a one address as default")
+    #         active_address = None
+    
+    #     return render(request,'checkout.html',{"cart_data":request.session['cart_data_obj'], 
+    #                 'totalcartitems':len(request.session['cart_data_obj']),
+    #                 'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form,
+    #                 'active_address':active_address})
 
 @login_required
 def payment_completed_view(request):

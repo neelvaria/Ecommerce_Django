@@ -22,7 +22,7 @@ admin.site.register(Vendor,VendorAdmin)
 
 class CartorderAdmin(admin.ModelAdmin):
     list_editable = ['paid_status','product_status']
-    list_display = ['user','price','paid_status','order_date','product_status']
+    list_display = ['user','price','paid_status','order_date','product_status','oid']
 admin.site.register(Cartorder,CartorderAdmin)
 
 class CartorderitemAdmin(admin.ModelAdmin):
@@ -47,3 +47,7 @@ class Product_imageAdmin(admin.ModelAdmin):
     
     list_display = ['product','images']
 admin.site.register(ProductImage,Product_imageAdmin)
+
+class couponAdmin(admin.ModelAdmin):
+    list_display = ['code','discount','active']
+admin.site.register(Coupon,couponAdmin)

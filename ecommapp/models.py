@@ -82,8 +82,8 @@ class Product(models.Model):
     title = models.CharField(max_length=100, default="Product Title")
     image = models.ImageField(upload_to=user_directory_path)
     description = RichTextUploadingField(null=True,blank=True, default="Product Description")  
-    price = models.DecimalField(max_digits=9999999999, decimal_places=2, default=1.99)
-    old_price = models.DecimalField(max_digits=9999999999, decimal_places=2, default=2.99)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=1.99)
+    old_price = models.DecimalField(max_digits=12, decimal_places=2, default=2.99)
     
     # specification = models.TextField(null=True,blank=True) 
     specification = RichTextUploadingField(null=True,blank=True) 
@@ -136,13 +136,36 @@ class ProductImage(models.Model):
 
 class Cartorder(models.Model):
     user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
-    price = models.DecimalField(max_digits=9999999999, decimal_places=2, default=1.99)
+    product_sku = models.ManyToManyField(Product)
+    full_name = models.CharField(max_length=200, null=True, blank=True)
+    email = models.EmailField(max_length=200, null=True, blank=True)
+    phone = models.CharField(max_length=200, null=True, blank=True)
+    
+    city = models.CharField(max_length=200, null=True, blank=True)
+    country = models.CharField(max_length=200, null=True, blank=True)
+    state = models.CharField(max_length=200, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    saved_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    
+    shipping_method = models.CharField(max_length=200, null=True, blank=True)
+    tracking_id = models.CharField(max_length=200, null=True, blank=True)
+    tracking_website_address = models.CharField(max_length=200, null=True, blank=True)
+    
     paid_status = models.BooleanField(default=False) 
-    order_date = models.DateTimeField(auto_now_add=False)
+    order_date = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     product_status = models.CharField(choices=STATUS_CHOICES, max_length=30, default="Process")
+    
+    stripe_payment_intent = models.CharField(max_length=1000, null=True, blank=True)
+    coupon = models.ManyToManyField("ecommapp.Coupon", blank=True)
+    oid = ShortUUIDField(unique=True,length=5,max_length=10,alphabet="1234567890",prefix="oid")
     
     class Meta:
         verbose_name_plural = "Cart Orders"
+        
+    def get_sku(self):
+        return [product.sku for product in self.product_sku.all()]
     
 class CartorderItem(models.Model):
     order = models.ForeignKey(Cartorder,on_delete=models.CASCADE)
@@ -151,8 +174,8 @@ class CartorderItem(models.Model):
     item = models.CharField(max_length=200)
     image = models.CharField(max_length=200)
     qty = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=9999999999, decimal_places=2, default=1.99)
-    total = models.DecimalField(max_digits=9999999999, decimal_places=2, default=1.99)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=1.99)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=1.99)
     
     class Meta:
         verbose_name_plural = "Cart Order Items"
@@ -201,3 +224,11 @@ class Address(models.Model):
     def __str__(self):
         return self.address
 
+class Coupon(models.Model):
+    code = models.CharField(max_length=20)
+    discount = models.IntegerField(default=1)
+    active = models.BooleanField(default=False)
+    
+    
+    def __str__(self):
+        return self.code
