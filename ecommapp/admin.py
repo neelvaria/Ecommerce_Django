@@ -22,7 +22,7 @@ admin.site.register(Vendor,VendorAdmin)
 
 class CartorderAdmin(admin.ModelAdmin):
     list_editable = ['paid_status','product_status']
-    list_display = ['user','price','paid_status','order_date','product_status','oid']
+    list_display = ['user','price','paid_status','order_date','product_status','oid','saved']
 admin.site.register(Cartorder,CartorderAdmin)
 
 class CartorderitemAdmin(admin.ModelAdmin):

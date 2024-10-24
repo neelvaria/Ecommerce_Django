@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
+from environ import Env
+env = Env()
+env.read_env('.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,6 +88,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ecommprj.wsgi.application'
 CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins (for testing)
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
@@ -172,3 +177,6 @@ CKEDITOR_CONFIGS = {
 
 PAYPAL_RECEIVER_EMAIL = 'businessneel@gmail.com'
 PAYPAL_TEST = True
+
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')

@@ -1,4 +1,5 @@
 from django.shortcuts import render , get_object_or_404 , redirect
+from django.urls import reverse
 from ecommapp.forms import *
 from ecommapp.models import *
 from django.db.models import Count,Avg
@@ -7,17 +8,16 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.conf import settings
-
-#paypal stuff
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from paypal.standard.forms import PayPalPaymentsForm
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 import calendar
-from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import *
 from userauth.models import *
+from django.conf import settings
+
+#stripe payment
+import stripe
 
 # Create your views here.
 
@@ -309,7 +309,6 @@ def save_checkout_info(request):
                 )
         return redirect('ecommapp:checkout', order.oid)
     return redirect('ecommapp:checkout', order.oid)
-
             
 @login_required
 def checkout_view(request,oid):
@@ -318,19 +317,34 @@ def checkout_view(request,oid):
     
     if request.method == "POST":
         code = request.POST.get('code')
-        coupon = Coupon.objects.filter(code = code,active=True).first()
+        coupon  = Coupon.objects.filter(code = code,active=True).first()
         if coupon:
             if coupon in order.coupon.all():
                 messages.warning(request,'Coupon already activated!!')
                 return redirect('ecommapp:checkout', order.oid)
             else:
-                messages.warning(request,'Coupon already applied!!')
+                discount = order.price * coupon.discount / 100
+                order.coupon.add(coupon)
+                order.price -= discount
+                order.saved += discount
+                order.save()
+                order.refresh_from_db()
+                
+                print(f"Order Price: {order.price}, Coupon Discount: {coupon.discount}%")
+                print(f"Discount: {discount}, New Price: {order.price - discount}")
+                print(f"Saved Price: {order.saved + discount}")
+
+                
+                messages.success(request,'Coupon applied!!')
                 return redirect('ecommapp:checkout', order.oid)
-        print(code)
+        else:
+            messages.error(request,'Invalid coupon code!!')
+            return redirect('ecommapp:checkout', order.oid)
     
     context = {
         'order':order,
-        'order_items':order_items
+        'order_items':order_items,
+        'stripe_publishable':settings.STRIPE_PUBLIC_KEY
     }
     
     return render(request,'checkout.html',context)
@@ -387,18 +401,50 @@ def checkout_view(request,oid):
     #                 'cart_total_amount':cart_total_amount , 'paypal_form':paypal_form,
     #                 'active_address':active_address})
 
-@login_required
-def payment_completed_view(request):
-    address = Address.objects.filter(user=request.user, status = True).first()
+@csrf_exempt
+def create_checkout_session(request,oid):
+    order = Cartorder.objects.get(oid=oid)
+    stripe.api_key = settings.STRIPE_SECRET_KEY
     
-    cart_total_amount = 0
-    if 'cart_data_obj' in request.session:
-        for p_id, p_data in request.session['cart_data_obj'].items():
-            cart_total_amount += float(p_data['price']) * int(p_data['qty'])
-        
-    return render(request,'payment-completed.html',{"cart_data":request.session['cart_data_obj'], 
-                    'totalcartitems':len(request.session['cart_data_obj']),
-                    'cart_total_amount':cart_total_amount,'address':address})
+    checkout_session = stripe.checkout.Session.create(
+        customer_email=order.user.email,
+        payment_method_types=['card'],
+        line_items=[
+            {
+                'price_data': {
+                    'currency': 'usd',
+                    'unit_amount': int(order.price * 100),
+                    'product_data': {
+                        'name': order.user.username,
+                    },
+                },
+                'quantity': 1,
+            },
+        ],
+        mode='payment',
+        # success_url='http://127.0.0.1:8000/payment-success/',
+        # cancel_url='http://127.0.0.1:8000/payment-failed/',
+        success_url= request.build_absolute_uri(reverse('ecommapp:payment-success', args=[oid])) + '?status={CHECKOUT_SESSION_ID}',
+        cancel_url= request.build_absolute_uri(reverse('ecommapp:payment-failed'))
+    )
+    
+    order.paid_status = False
+    order.stripe_payment_intent = checkout_session['id']
+    order.save()
+    
+    return JsonResponse({"sessionId": checkout_session.id})     
+
+@login_required
+def payment_completed_view(request,oid):
+    order = Cartorder.objects.get(oid = oid)
+    if order.paid_status == False:
+        order.paid_status = True
+        order.save()
+    
+    context = {
+        'order':order
+    }
+    return render(request,'payment-completed.html',context)
 
 def payment_failed_view(request):
     return render(request,'payment-failed.html')

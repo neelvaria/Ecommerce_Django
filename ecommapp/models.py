@@ -147,7 +147,7 @@ class Cartorder(models.Model):
     address = models.CharField(max_length=200, null=True, blank=True)
     
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    saved_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    saved = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     
     shipping_method = models.CharField(max_length=200, null=True, blank=True)
     tracking_id = models.CharField(max_length=200, null=True, blank=True)

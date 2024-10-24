@@ -43,7 +43,7 @@ urlpatterns = [
     path('paypal/',include('paypal.standard.ipn.urls')),
     
     #payment success
-    path('payment-success/',views.payment_completed_view,name="payment-success"),
+    path('payment-success/<oid>/',views.payment_completed_view,name="payment-success"),
     
     #payment failed
     path('payment-failed/',views.payment_failed_view,name="payment-failed"),
@@ -61,5 +61,8 @@ urlpatterns = [
     #contact
     path('contact/',views.contact_view,name="contact"),
     path('contact-ajax', views.ajax_contact, name='contact-ajax'),  # Match this with the AJAX call
+    
+    #stripe payment
+    path('api/create_checkout_session/<str:oid>/',views.create_checkout_session,name="create_checkout_session"),
 
 ]
