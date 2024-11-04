@@ -4,5 +4,7 @@ from useradmin import views
 app_name = "useradmin"
 
 urlpatterns = [
-    path("dashboard/",views.vendor_dashboard,name="dashboard"),
+    path("",views.vendor_dashboard,name="dashboard"),
+    path("products/",views.product_list,name="products"),
+    path("addproduct/",views.add_product,name="addproduct"),
 ]
