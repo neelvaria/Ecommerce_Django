@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # 'django.contrib.sites',
     'ecommapp',
     'userauth',
+    'useradmin',
     
     #paypal
     'paypal.standard.ipn',
