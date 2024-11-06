@@ -16,19 +16,8 @@ class AddProduct(forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'title',
-            'image',
-            'description',
-            'price',
-            'old_price',
-            'specification',
-            'type',
-            'stock',
-            'expiry',
-            'mfg',
-            'tags',
-            'in_stock',
-            'digital',
+            'title','image','description','price','old_price','specification','type',
+            'stock','expiry','mfg','tags','in_stock','digital','category'
         ]
     
     

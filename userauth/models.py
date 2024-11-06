@@ -37,6 +37,8 @@ class profile_details(models.Model):
     bio = models.CharField(max_length=100)
     phone = models.CharField(max_length=25, null=True, blank=True)
     verified = models.BooleanField(default=False)
+    address = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
     
     class Meta:
         verbose_name = "Profile Details"

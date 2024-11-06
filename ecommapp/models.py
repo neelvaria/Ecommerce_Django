@@ -6,11 +6,13 @@ from taggit.managers import TaggableManager
 from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
-STATUS_CHOICES = (
-    ("process","Process"),
-    ("shipped","Shipped"),
-    ("delivered","Delivered"), 
-)
+STATUS_CHOICES = [
+    ('Processing', 'Processing'),
+    ('Awaiting payment', 'Awaiting payment'),
+    ('Confirmed', 'Confirmed'),
+    ('Shipped', 'Shipped'),
+    ('Delivered', 'Delivered'),
+]
 
 STATUS = (
     ("disabled","Disabled"), 
@@ -155,7 +157,7 @@ class Cartorder(models.Model):
     
     paid_status = models.BooleanField(default=False) 
     order_date = models.DateTimeField(auto_now_add=True,null=True,blank=True)
-    product_status = models.CharField(choices=STATUS_CHOICES, max_length=30, default="Process")
+    product_status = models.CharField(choices=STATUS_CHOICES, max_length=30, default="Processing", null=True, blank=True)
     
     stripe_payment_intent = models.CharField(max_length=1000, null=True, blank=True)
     coupon = models.ManyToManyField("ecommapp.Coupon", blank=True)

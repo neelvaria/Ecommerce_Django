@@ -1,0 +1,173 @@
+{% include 'useradmin/nav.html' %}
+{% load static %}
+
+{% if messages %}
+{% for msg in messages %}
+    <div class="alert alert-{{msg.tags}}">
+        <strong>{{ msg }}</strong>
+    </div>
+{% endfor %}
+{% endif %}
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Order detail</h2>
+                        <p>Details for Order ID: {{order.oid}}</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <header class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                                <span> <i class="material-icons md-calendar_today"></i> <b>{{order.order_date}}</b> </span> <br />
+                                <small class="text-muted">Order ID: {{order.oid}}</small>
+                            </div>
+                            <form method="post" action="{% url 'useradmin:change_order_status' order.oid %}" class="col-lg-6 col-md-6 ms-auto text-md-end">
+                                <select name="status" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
+                                    <option value="">Change Order Status</option>
+                                    <option value="Awaiting payment">Awaiting payment</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                </select>
+                                <button class="btn btn-primary" type="submit">Save</button>
+                                <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                            </form>
+                        </div>
+                    </header>
+                    <!-- card-header end// -->
+                    <div class="card-body">
+                        <div class="row mb-50 mt-20 order-info-wrap">
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Customer</h6>
+                                        <p class="mb-1">
+                                            {{order.full_name}} <br />
+                                            {{order.email}} <br />
+                                            +91 {{order.phone}}
+                                        </p>
+                                        <a href="#">View profile</a>
+                                    </div>
+                                </article>
+                            </div>
+                            <!-- col// -->
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-local_shipping"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Order info</h6>
+                                        <p class="mb-1">
+                                            Shipping: {{order.shipping_method}} <br />
+                                            Order Id: {{order.oid}} <br />
+                                            Order Status: {{order.product_status|title}} <br />
+                                            Payment Status: 
+                                            {% if order.paid_status == True%}Paid {% else %}Pendinf{% endif %}
+                                        </p>
+                                        <a href="#">Download info</a>
+                                    </div>
+                                </article>
+                            </div>
+                            <!-- col// -->
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-place"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Deliver to</h6>
+                                        <p class="mb-1">
+                                            Address: {{order.address}} <br />
+                                            City: {{order.city}} <br />
+                                            State: {{order.state}} <br />
+                                            Country: {{order.country}}
+                                        </p>
+                                        <a href="#">View profile</a>
+                                    </div>
+                                </article>
+                            </div>
+                            <!-- col// -->
+                        </div>
+                        <!-- row // -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th width="40%">Product</th>
+                                                <th width="30%">Unit Price</th>
+                                                <th width="30%">Quantity</th>
+                                                <th width="30%" class="text-end">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                            {% for o in products %}                                                
+                                                <tr>
+                                                    <td>
+                                                        <a class="itemside" href="#">
+                                                            <div class="left">
+                                                                <img src="{{o.image}}" width="60" height="70" class="img-xs" alt="Item" />
+                                                            </div>
+                                                            <div class="info">{{o.product.title}}</div>
+                                                        </a>
+                                                    </td>
+                                                    <td>${{o.price}}</td>
+                                                    <td>{{o.qty}}</td>
+                                                    <td class="text-end">${{o.total}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            <tr>
+                                                <td colspan="4">
+                                                    <article class="float-end">
+                                                        <dl class="dlist">
+                                                            <dt>Tax:</dt>
+                                                            <dd>$0.00</dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Shipping:</dt>
+                                                            <dd>$0.00</dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Discount:</dt>
+                                                            <dd>${{order.saved}}</dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Grand total:</dt>
+                                                            <dd><b class="h5">${{order.price}}</b></dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt class="text-muted">Status:</dt>
+                                                            <dd>
+                                                                <span class="">
+                                                                    {% if order.paid_status == True%}
+                                                                        <span class="badge badge-pill badge-soft-success">Payment Done</span> 
+                                                                    {% else %}
+                                                                        <span class="badge badge-pill badge-soft-warning">Pending</span>
+                                                                    {% endif %}
+                                                                </span>
+                                                            </dd>
+                                                        </dl>
+                                                    </article>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- table-responsive// -->
+                            </div>
+                            <!-- col// -->
+                            
+                        </div>
+                    </div>
+                    <!-- card-body end// -->
+                </div>
+                <!-- card end// -->
+            </section>
+{% include 'useradmin/footer.html' %}
